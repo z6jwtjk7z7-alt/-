@@ -1,9 +1,0 @@
-{
-  "name": "단어장",
-  "short_name": "단어장",
-  "start_url": "./",
-  "display": "standalone",
-  "background_color": "#f5f7fb",
-  "theme_color": "#2563eb",
-  "icons": []
-}
