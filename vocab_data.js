@@ -1,1 +1,0 @@
-window.MERITOEIC_LIBRARY = [];
