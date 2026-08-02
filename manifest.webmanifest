@@ -1,9 +1,0 @@
-{
-  "name": "단어장",
-  "short_name": "단어장",
-  "start_url": "./",
-  "display": "standalone",
-  "background_color": "#f4f7fb",
-  "theme_color": "#2563eb",
-  "description": "토익 단어 시험, 오답 복습, OCR, 통계, 백업"
-}
