@@ -1,0 +1,1 @@
+window.WORDBOOK_DEFAULT_WORDS = [];
