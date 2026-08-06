@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2563eb">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<title>단어장</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#6b7280;--line:#dbe2ea;--blue:#2563eb;--blue2:#eff6ff;--green:#16a34a;--green2:#dcfce7;--red:#dc2626;--red2:#fee2e2;--shadow:0 8px 24px rgba(15,23,42,.07)}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,select,textarea{font:inherit} button{cursor:pointer}
+header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.head{max-width:1080px;margin:auto;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.brand{font-size:22px;font-weight:850}.summary{font-size:13px;color:var(--muted)}
+.tabs{max-width:1080px;margin:auto;display:flex;gap:6px;padding:0 12px 10px;overflow-x:auto}
+.tab{white-space:nowrap;border:0;background:transparent;padding:10px 12px;border-radius:10px;color:#475569;font-weight:700}
+.tab.active{background:var(--blue);color:white}.badge{display:inline-flex;min-width:20px;height:20px;align-items:center;justify-content:center;border-radius:999px;background:var(--red);color:#fff;font-size:11px;margin-left:4px;padding:0 5px}
+main{max-width:1080px;margin:18px auto;padding:0 14px 60px}.hidden{display:none!important}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow);margin-bottom:14px}
+h2{margin:0 0 14px;font-size:19px}.note{font-size:13px;color:var(--muted);line-height:1.5}.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+input,select,textarea{border:1px solid var(--line);border-radius:10px;padding:11px 12px;background:white;min-width:0}
+textarea{width:100%;min-height:170px;resize:vertical}
+button,.file-label{border:1px solid var(--line);border-radius:10px;padding:11px 14px;background:#fff;font-weight:750;display:inline-flex;align-items:center;justify-content:center}
+button.primary,.file-label.primary{background:var(--blue);color:white;border-color:var(--blue)} button.danger{background:var(--red);color:white;border-color:var(--red)}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.stat{text-align:center;background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:16px}.stat b{display:block;font-size:25px;margin-top:5px}
+.quiz-head{display:flex;justify-content:space-between;color:var(--muted);font-size:13px}.progress{height:8px;background:#e5e7eb;border-radius:99px;overflow:hidden;margin:10px 0 22px}.progress>div{height:100%;background:var(--blue);width:0}
+.qtype{color:var(--blue);font-weight:800;text-align:center}.qtext{text-align:center;font-size:32px;font-weight:900;margin:18px 0 22px;word-break:break-word}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}.choice{text-align:left;padding:15px;border:1px solid var(--line);border-radius:12px;background:#fff;min-height:56px}
+.choice.correct{background:var(--green2);border-color:var(--green)}.choice.wrong{background:var(--red2);border-color:var(--red)}.choice:disabled{opacity:1;cursor:default}
+.result{min-height:48px;margin-top:12px;padding:12px;border-radius:10px}.result.good{background:var(--green2);color:#166534}.result.bad{background:var(--red2);color:#991b1b}
+.word-row{display:grid;grid-template-columns:minmax(140px,1fr) minmax(180px,2fr) auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #edf1f5}.word-row:last-child{border:0}.en{font-weight:850}.pronunciation{display:inline-flex;align-items:center;gap:5px;margin-left:6px;border:0;background:transparent;padding:2px 4px;color:var(--blue);font-size:13px;font-weight:700}.pronunciation:disabled{color:var(--muted);cursor:default}.meta{font-size:12px;color:var(--muted)}
+.days{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}.day-card{border:1px solid var(--line);border-radius:13px;padding:14px;background:#fff}.day-card b{font-size:18px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#111827;color:#fff;padding:12px 16px;border-radius:12px;z-index:100;opacity:0;pointer-events:none;transition:.2s}.toast.show{opacity:1}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.cal{min-height:54px;border:1px solid var(--line);border-radius:9px;padding:5px;font-size:11px}.cal.active{background:var(--green2)}.cal.today{outline:2px solid var(--blue)}
+input[type=file]{display:none}.error-box{background:#fff7ed;border:1px solid #fdba74;color:#9a3412;padding:12px;border-radius:10px;margin-top:10px}
+@media(max-width:700px){.grid2,.grid3,.choices{grid-template-columns:1fr}.word-row{grid-template-columns:1fr auto}.word-row .meaning{grid-column:1/3}.qtext{font-size:28px}.head{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<header>
+  <div class="head"><div><div class="brand">단어장</div><div id="topSummary" class="summary">단어 0개</div></div><button id="installBtn" class="hidden">홈 화면에 설치</button></div>
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-tab="quiz">시험지</button>
+    <button class="tab" data-tab="wrong">내 단어장 <span id="wrongBadge" class="badge">0</span></button>
+    <button class="tab" data-tab="words">전체 단어</button>
+    <button class="tab" data-tab="days">Day별</button>
+    <button class="tab" data-tab="add">단어 추가</button>
+    <button class="tab" data-tab="stats">통계·백업</button>
+  </nav>
+</header>
+<main>
+<section id="quizSection">
+  <div class="card">
+    <h2>시험 설정</h2>
+    <div class="toolbar">
+      <select id="quizScope"><option value="all">전체 단어</option><option value="wrong">오답만</option><option value="favorite">즐겨찾기</option></select>
+      <select id="quizDay"><option value="">모든 Day</option></select>
+      <select id="quizSource"><option value="">모든 자료</option></select>
+      <select id="quizCount"><option>10</option><option>20</option><option>30</option><option>50</option><option value="9999">전체</option></select>
+      <button class="primary" id="newQuizBtn">새 시험지(랜덤)</button>
+    </div>
+    <div class="note" style="margin-top:8px">영어 단어가 나오면 한국어 뜻을 4개 보기에서 고릅니다.</div>
+  </div>
+  <div class="card">
+    <div class="quiz-head"><span id="qCount">0 / 0</span><span id="scoreText">정답 0 · 오답 0</span></div>
+    <div class="progress"><div id="progressBar"></div></div>
+    <div class="qtype">영어 → 한국어 뜻</div>
+    <div id="qText" class="qtext">단어를 추가한 뒤 새 시험지를 만들어 주세요.</div>
+    <div id="choices" class="choices"></div>
+    <div id="resultBox" class="result"></div>
+    <div class="toolbar" style="justify-content:flex-end"><button id="nextBtn" disabled>다음 문제</button></div>
+  </div>
+</section>
+
+<section id="wrongSection" class="hidden">
+  <div class="card">
+    <div class="toolbar" style="justify-content:space-between;align-items:center">
+      <div>
+        <h2 style="margin-bottom:6px">내 단어장</h2>
+        <div class="note">틀린 단어와 즐겨찾기한 단어를 카테고리별로 확인할 수 있습니다.</div>
+      </div>
+      <div class="toolbar"><select id="myWordCategory"><option value="due">오늘 복습</option><option value="wrong">오답 집중</option><option value="longterm">장기 복습</option><option value="mastered">학습 완료</option><option value="favorite">즐겨찾기</option><option value="all">전체 내 단어</option></select><button id="wrongQuizBtn" class="primary">오늘 복습 시험</button></div>
+    </div>
+    <div id="wrongQuizInfo" class="note" style="margin:10px 0"></div>
+    <div id="wrongList"></div>
+  </div>
+</section>
+
+<section id="wordsSection" class="hidden">
+  <div class="card">
+    <h2>전체 단어</h2>
+    <div class="toolbar"><input id="searchInput" placeholder="영어 또는 뜻 검색"><select id="wordDayFilter"><option value="">모든 Day</option></select><select id="wordSourceFilter"><option value="">모든 자료</option></select></div>
+    <div id="wordList"></div>
+  </div>
+</section>
+
+<section id="daysSection" class="hidden">
+  <div class="card"><h2>Day별 학습</h2><div id="dayCards" class="days"></div></div>
+  <div id="dayDetail" class="card hidden"><div class="toolbar" style="justify-content:space-between"><h2 id="dayTitle"></h2><button id="dayQuizBtn" class="primary">이 Day 시험</button></div><div id="dayWordList"></div></div>
+</section>
+
+<section id="addSection" class="hidden">
+  <div class="card">
+    <h2>텍스트로 추가</h2>
+    <div class="grid2"><input id="sourceName" placeholder="자료 이름 (예: 노랭이, 기출 7월)"><input id="defaultDay" placeholder="기본 Day (선택)"></div>
+    <textarea id="bulkText" placeholder="영어 | 한국어 뜻&#10;resume | 이력서&#10;&#10;Day 2&#10;applicant | 지원자"></textarea>
+    <div class="toolbar"><button class="primary" id="addTextBtn">단어 추가</button><button id="clearTextBtn">입력 지우기</button></div>
+    <div id="addResult" class="note" style="margin-top:8px"></div>
+  </div>
+  <div class="card">
+    <h2>파일·사진 가져오기</h2>
+    <div class="toolbar">
+      <label class="file-label" for="textFile">TXT·CSV</label><input id="textFile" type="file" accept=".txt,.csv,text/plain,text/csv">
+      <label class="file-label" for="excelFile">Excel</label><input id="excelFile" type="file" accept=".xlsx,.xls">
+      <label class="file-label" for="pdfFile">PDF</label><input id="pdfFile" type="file" accept="application/pdf">
+      <label class="file-label primary" for="imageFile">사진·카메라 OCR</label><input id="imageFile" type="file" accept="image/*" capture="environment" multiple>
+    </div>
+    <div class="note" style="margin-top:10px">TXT는 Day 1·DAY1·# Day 1·Day: 1 형식을 자동 인식해 즉시 Day별로 추가합니다. Excel은 Day·단어·뜻 열을, PDF는 텍스트형 PDF를 우선 추출합니다.</div>
+    <div id="importStatus"></div>
+  </div>
+</section>
+
+<section id="statsSection" class="hidden">
+  <div class="grid3">
+    <div class="stat">전체 단어<b id="statWords">0</b></div><div class="stat">오답 단어<b id="statWrong">0</b></div><div class="stat">전체 정답률<b id="statAccuracy">0%</b></div>
+  </div>
+  <div class="card"><h2>학습 기록</h2><div class="grid2"><div><div class="stat">현재 연속 학습<b id="currentStreak">0일</b></div></div><div><div class="stat">최장 연속 학습<b id="bestStreak">0일</b></div></div></div><div id="calendarTitle" style="font-weight:800;margin:16px 0 8px"></div><div id="calendar" class="calendar"></div></div>
+  <div class="card">
+    <h2>복습 알림</h2>
+    <div class="toolbar"><select id="reviewInterval"><option value="1">자동 최적 복습</option><option value="0">알림 끄기</option></select><input id="reviewTime" type="time" value="20:00"><button id="saveReminderBtn" class="primary">알림 설정</button><button id="pushConnectBtn">백그라운드 알림 연결</button></div>
+    <div id="reminderInfo" class="note" style="margin-top:8px">오답은 10분→1일→3일, 이후 7일→14일→30일→60일 간격으로 자동 복습합니다.</div>
+    <div id="pushStatus" class="note" style="margin-top:8px">홈 화면에 설치한 뒤 백그라운드 알림을 연결하세요.</div>
+  </div>
+  <div class="card">
+    <h2>백업·복원</h2>
+    <div class="toolbar"><button id="exportBtn" class="primary">백업 내보내기</button><label class="file-label" for="backupFile">백업 불러오기</label><input id="backupFile" type="file" accept=".json,application/json"><button id="resetBtn" class="danger">모든 데이터 초기화</button></div>
+    <div class="note" style="margin-top:8px">백업 파일을 iCloud Drive에 저장하면 다른 기기에서 불러올 수 있습니다.</div>
+  </div>
+</section>
+</main>
+<div id="toast" class="toast"></div>
+
+<script src="firebase-config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-messaging-compat.js"></script>
+<script>
+"use strict";
+const STORAGE_KEY="wordbook_final_2026_v1";
+const $=id=>document.getElementById(id);
+const uid=()=>crypto.randomUUID?crypto.randomUUID():(Date.now().toString(36)+Math.random().toString(36).slice(2));
+const todayKey=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`};
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function emptyState(){return{version:3,words:[],wrongIds:[],stats:{correct:0,wrong:0,daily:{}},settings:{reviewInterval:1,reviewTime:"20:00",lastReminder:"",pushUserId:"",pushEnabled:false}}}
+function addDaysISO(days){const d=new Date();d.setDate(d.getDate()+days);return d.toISOString()}
+function addMinutesISO(minutes){const d=new Date();d.setMinutes(d.getMinutes()+minutes);return d.toISOString()}
+function normalizeState(raw){
+ const s=raw&&typeof raw==="object"?raw:emptyState();
+ s.version=3;s.words=Array.isArray(s.words)?s.words:[];
+ s.wrongIds=Array.isArray(s.wrongIds)?s.wrongIds:[];
+ s.stats=s.stats&&typeof s.stats==="object"?s.stats:{};
+ s.stats.correct=Number(s.stats.correct)||0;s.stats.wrong=Number(s.stats.wrong)||0;s.stats.daily=s.stats.daily&&typeof s.stats.daily==="object"?s.stats.daily:{};
+ s.settings=s.settings&&typeof s.settings==="object"?s.settings:{};s.settings.reviewInterval=s.settings.reviewInterval===0?0:1;s.settings.reviewTime=String(s.settings.reviewTime||"20:00");s.settings.lastReminder=String(s.settings.lastReminder||"");
+ s.words=s.words.map(w=>{
+  const isWrong=s.wrongIds.includes(w.id);
+  return{id:w.id||uid(),en:String(w.en||w.word||"").trim(),ko:String(w.ko||w.meaning||"").trim(),day:String(w.day||"").trim(),source:String(w.source||"직접 추가").trim(),ipa:String(w.ipa||"").trim(),favorite:!!w.favorite,correct:Number(w.correct)||0,wrong:Number(w.wrong)||0,lastReviewed:w.lastReviewed||"",reviewStatus:String(w.reviewStatus||(isWrong?"wrong":"new")),reviewLevel:Number(w.reviewLevel)||0,correctStreak:Number(w.correctStreak)||0,nextReview:String(w.nextReview||(isWrong?new Date().toISOString():"")),lastResult:String(w.lastResult||"")};
+ }).filter(w=>w.en&&w.ko);
+ s.wrongIds=s.wrongIds.filter(id=>s.words.some(w=>w.id===id));
+ return s;
+}
+function loadState(){
+ try{const saved=localStorage.getItem(STORAGE_KEY);if(saved)return normalizeState(JSON.parse(saved))}catch(e){}
+ // 이전 버전 데이터 자동 이전
+ for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!k||k===STORAGE_KEY)continue;try{const x=JSON.parse(localStorage.getItem(k));if(x&&Array.isArray(x.words)&&x.words.length){const migrated=normalizeState(x);localStorage.setItem(STORAGE_KEY,JSON.stringify(migrated));return migrated}}catch(e){}}
+ return emptyState();
+}
+let state=loadState(),quiz=[],current=0,correctNow=0,wrongNow=0,answered=false,activeDay="";
+function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}
+function toast(msg){$("toast").textContent=msg;$("toast").classList.add("show");setTimeout(()=>$("toast").classList.remove("show"),1800)}
+function byId(id){return state.words.find(w=>w.id===id)}
+function recordDaily(ok){const k=todayKey(),d=state.stats.daily[k]||(state.stats.daily[k]={correct:0,wrong:0});d[ok?"correct":"wrong"]++}
+function addWords(rows){
+ let added=0,merged=0;
+ for(const r of rows){
+  const en=String(r.en||"").trim(),ko=String(r.ko||"").trim();if(!en||!ko)continue;
+  const day=String(r.day||"").replace(/^day\s*/i,"").trim(),source=String(r.source||"직접 추가").trim()||"직접 추가";
+  const old=state.words.find(w=>w.en.toLowerCase()===en.toLowerCase()&&w.day===day&&w.source===source);
+  if(old){if(!old.ko.includes(ko))old.ko=old.ko+"; "+ko;merged++}else{state.words.push({id:uid(),en,ko,day,source,ipa:String(r.ipa||"").trim(),favorite:false,correct:0,wrong:0,lastReviewed:"",reviewStatus:"new",reviewLevel:0,correctStreak:0,nextReview:"",lastResult:""});added++}
+ }
+ save();refreshAll();enrichMissingPronunciations();return{added,merged}
+}
+function parseText(text,source,defaultDay){
+ const rows=[];
+ let day=String(defaultDay||"").replace(/^day\s*/i,"").trim();
+ let currentSource=String(source||"직접 추가").trim()||"직접 추가";
+
+ for(let raw of String(text).split(/\r?\n/)){
+  raw=raw.replace(/^\uFEFF/,"").trim();
+  if(!raw)continue;
+
+  // Day 1 / DAY1 / # Day 1 / Day: 1 / Day-1 / [Day 1]
+  const dm=raw.match(/^(?:#{1,6}\s*)?\[?\s*day\s*[:\-]?\s*(\d{1,3})\s*\]?\s*$/i);
+  if(dm){
+    day=String(Number(dm[1]));
+    continue;
+  }
+
+  // 자료명 또는 날짜 구분선
+  const sm=raw.match(/^(?:#{1,6}\s*)?(?:자료명|source)\s*[:\-]\s*(.+)$/i);
+  if(sm){
+    currentSource=sm[1].trim()||currentSource;
+    continue;
+  }
+
+  const dateHeading=raw.match(/^#{1,6}\s*(\d{4}-\d{2}-\d{2})\s*$/);
+  if(dateHeading){
+    currentSource=dateHeading[1];
+    continue;
+  }
+
+  let en="",ko="";
+  if(raw.includes("|")){
+    const i=raw.indexOf("|");
+    en=raw.slice(0,i).trim();
+    ko=raw.slice(i+1).trim();
+  }else if(raw.includes("\t")){
+    const p=raw.split("\t");
+    en=String(p.shift()||"").trim();
+    ko=p.join(" ").trim();
+  }else{
+    // CSV 한 줄 지원: english,"한국어 뜻"
+    const m=raw.match(/^\s*([^,]+?)\s*,\s*"?(.+?)"?\s*$/);
+    if(m){en=m[1].trim();ko=m[2].replace(/^"|"$/g,"").trim()}
+  }
+
+  en=en.replace(/^\d{1,4}[.)]?\s*/,"").trim();
+  if(/^(english|word|단어)$/i.test(en)&&/^(korean|meaning|뜻)$/i.test(ko))continue;
+  if(en&&ko)rows.push({en,ko,day,source:currentSource});
+ }
+ return rows;
+}
+function uniqueDays(){return [...new Set(state.words.map(w=>w.day).filter(Boolean))].sort((a,b)=>(+a||999)-(+b||999)||a.localeCompare(b))}
+function uniqueSources(){return [...new Set(state.words.map(w=>w.source).filter(Boolean))].sort()}
+function updateSelect(el,values,first){const old=el.value;el.innerHTML=`<option value="">${first}</option>`+values.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");if(values.includes(old))el.value=old}
+async function fetchIPA(word){
+ try{const r=await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);if(!r.ok)return"";const data=await r.json();for(const entry of data||[]){if(entry.phonetic)return entry.phonetic;for(const ph of entry.phonetics||[]){if(ph.text)return ph.text}}}catch(e){}return""
+}
+let ipaBusy=false;
+async function enrichMissingPronunciations(){
+ if(ipaBusy||!navigator.onLine)return;const targets=state.words.filter(w=>!w.ipa).slice(0,30);if(!targets.length)return;ipaBusy=true;let changed=false;for(const w of targets){const ipa=await fetchIPA(w.en);if(ipa){w.ipa=ipa;changed=true;renderWords();renderWrong()}await new Promise(r=>setTimeout(r,80))}if(changed)save();ipaBusy=false
+}
+function speakWord(word){if(!("speechSynthesis" in window)){alert("이 기기에서는 음성 재생을 지원하지 않습니다.");return}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(word);u.lang="en-US";u.rate=.82;speechSynthesis.speak(u)}
+function refreshAll(){updateSelect($("quizDay"),uniqueDays(),"모든 Day");updateSelect($("wordDayFilter"),uniqueDays(),"모든 Day");updateSelect($("quizSource"),uniqueSources(),"모든 자료");updateSelect($("wordSourceFilter"),uniqueSources(),"모든 자료");renderWrong();renderWords();renderDays();renderStats();$("topSummary").textContent=`단어 ${state.words.length}개 · 오답 ${state.wrongIds.length}개`;$("wrongBadge").textContent=state.wrongIds.length}
+function setTab(name){document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===name));document.querySelectorAll("main>section").forEach(s=>s.classList.add("hidden"));$(name+"Section").classList.remove("hidden");if(name==="stats")renderStats()}
+$("tabs").addEventListener("click",e=>{const b=e.target.closest(".tab");if(b)setTab(b.dataset.tab)});
+function quizPool(){
+ let p=[...state.words];const scope=$("quizScope").value,day=$("quizDay").value,source=$("quizSource").value;
+ if(scope==="wrong")p=p.filter(w=>state.wrongIds.includes(w.id));if(scope==="favorite")p=p.filter(w=>w.favorite);if(day)p=p.filter(w=>w.day===day);if(source)p=p.filter(w=>w.source===source);return p
+}
+function meaningTokens(text){return String(text).toLowerCase().replace(/[()\[\],.;·/~-]/g," ").split(/\s+/).map(x=>x.replace(/(하다|되다|시키다|적인|으로|에게|에서|을|를|이|가|의)$/,"" )).filter(x=>x.length>1)}
+function englishShape(en){const a=String(en).toLowerCase().trim().split(/\s+/);return{first:a[0]||"",last:a[a.length-1]||"",words:a.length,phrasal:a.length>1}}
+function endingClass(ko){const x=String(ko).trim();if(/하다$/.test(x))return"하다";if(/되다$/.test(x))return"되다";if(/시키다$/.test(x))return"시키다";if(/인$|적인$/.test(x))return"형용";return"명사"}
+function distractorScore(item,cand){
+ const a=new Set(meaningTokens(item.ko)),b=new Set(meaningTokens(cand.ko));let score=0;
+ for(const t of a)if(b.has(t))score+=5;
+ const ea=englishShape(item.en),eb=englishShape(cand.en);
+ if(endingClass(item.ko)===endingClass(cand.ko))score+=4;
+ if(ea.phrasal&&eb.phrasal)score+=5;if(ea.first===eb.first)score+=8;if(ea.last===eb.last)score+=6;if(ea.words===eb.words)score+=2;
+ if(item.day&&item.day===cand.day)score+=1;if(item.source&&item.source===cand.source)score+=1;
+ score+=Math.random()*1.5;return score
+}
+const CONFUSION_BANK={
+ "하다":["승인하다, 허가하다","연기하다, 미루다","검토하다, 조사하다","제출하다, 건네다","처리하다, 다루다","참석하다, 참여하다","의존하다, 기대다","발생시키다, 야기하다","준수하다, 따르다","거절하다, 사양하다","회복하다, 극복하다","계속 진행하다"],
+ "되다":["승인되다, 허가되다","연기되다, 미뤄지다","완료되다, 끝나다","개선되다, 향상되다"],
+ "형용":["효율적인, 능률적인","필수적인, 꼭 필요한","잠정적인, 임시의","상당한, 중요한","이용 가능한, 접근 가능한"],
+ "명사":["승인, 허가","절차, 과정","전망, 가능성","수익, 이익","지연, 연기","조사, 검토"]
+};
+function makeOptions(item){
+ const correct=item.ko,seen=new Set([correct]);
+ const ranked=state.words.filter(w=>w.id!==item.id&&w.ko&&w.ko!==correct).map(w=>({text:w.ko,score:distractorScore(item,w)})).sort((a,b)=>b.score-a.score);
+ const picks=[];for(const x of ranked){if(!seen.has(x.text)){seen.add(x.text);picks.push(x.text)}if(picks.length===3)break}
+ const bank=CONFUSION_BANK[endingClass(correct)]||CONFUSION_BANK["명사"];
+ for(const x of shuffle(bank)){if(!seen.has(x)){seen.add(x);picks.push(x)}if(picks.length===3)break}
+ return picks.length===3?shuffle([correct,...picks]):[]
+}
+function buildQuiz(){
+ const pool=quizPool();if(pool.length<1){alert("선택한 범위에 단어가 없습니다.");return}
+ if(new Set(state.words.map(w=>w.ko)).size<4){alert("4지선다 시험에는 서로 다른 뜻이 최소 4개 필요합니다.");return}
+ const n=Math.min(Number($("quizCount").value)||10,pool.length);quiz=shuffle(pool).slice(0,n);current=0;correctNow=0;wrongNow=0;answered=false;renderQuiz()
+}
+function renderQuiz(){
+ if(!quiz.length){$("qCount").textContent="0 / 0";$("scoreText").textContent="정답 0 · 오답 0";$("progressBar").style.width="0%";$("qText").textContent="단어를 추가한 뒤 새 시험지를 만들어 주세요.";$("choices").innerHTML="";$("resultBox").className="result";$("resultBox").textContent="";$("nextBtn").disabled=true;return}
+ if(current>=quiz.length){$("qCount").textContent=`${quiz.length} / ${quiz.length}`;$("scoreText").textContent=`정답 ${correctNow} · 오답 ${wrongNow}`;$("progressBar").style.width="100%";$("qText").textContent=`시험 완료 · 정답률 ${Math.round(correctNow/quiz.length*100)}%`;$("choices").innerHTML="";$("resultBox").className="result good";$("resultBox").textContent="새 시험지를 누르면 다시 시작합니다.";$("nextBtn").disabled=true;refreshAll();return}
+ answered=false;const w=quiz[current];$("qCount").textContent=`${current+1} / ${quiz.length}`;$("scoreText").textContent=`정답 ${correctNow} · 오답 ${wrongNow}`;$("progressBar").style.width=`${current/quiz.length*100}%`;$("qText").textContent=w.en;$("choices").innerHTML="";$("resultBox").className="result";$("resultBox").textContent="";$("nextBtn").disabled=true;
+ const opts=makeOptions(w);if(opts.length<4){$("resultBox").className="result bad";$("resultBox").textContent="서로 다른 뜻이 부족합니다.";return}
+ opts.forEach(x=>{const b=document.createElement("button");b.className="choice";b.textContent=x;b.onclick=()=>answerQuiz(x,b);$("choices").appendChild(b)})
+}
+function scheduleAfterAnswer(w,ok){
+ w.lastReviewed=new Date().toISOString();w.lastResult=ok?"correct":"wrong";
+ if(!ok){w.correctStreak=0;w.reviewLevel=0;w.reviewStatus="wrong";w.nextReview=addMinutesISO(10);if(!state.wrongIds.includes(w.id))state.wrongIds.push(w.id);return}
+ w.correctStreak=(Number(w.correctStreak)||0)+1;
+ if(state.wrongIds.includes(w.id)||w.reviewStatus==="wrong"||w.reviewStatus==="learning"){
+  if(w.correctStreak===1){w.reviewStatus="learning";w.nextReview=addDaysISO(1)}
+  else if(w.correctStreak===2){w.reviewStatus="learning";w.nextReview=addDaysISO(3)}
+  else{w.reviewStatus="longterm";w.reviewLevel=Math.max(1,w.reviewLevel);w.nextReview=addDaysISO(7);state.wrongIds=state.wrongIds.filter(id=>id!==w.id)}
+ }else{
+  w.reviewStatus="longterm";w.reviewLevel=(Number(w.reviewLevel)||0)+1;
+  const intervals=[3,7,14,30,60,120];const days=intervals[Math.min(w.reviewLevel-1,intervals.length-1)];w.nextReview=addDaysISO(days);
+  if(w.reviewLevel>=6)w.reviewStatus="mastered";
+ }
+}
+function reviewLabel(w){if(!w.nextReview)return"미학습";const d=new Date(w.nextReview),now=new Date();if(d<=now)return"복습 예정";const days=Math.ceil((d-now)/86400000);return days<1?"오늘 다시":`${days}일 뒤 복습`}
+function answerQuiz(selected,btn){
+ if(answered)return;answered=true;const w=quiz[current],ok=selected===w.ko;
+ document.querySelectorAll(".choice").forEach(b=>{b.disabled=true;if(b.textContent===w.ko)b.classList.add("correct")});
+ if(ok){correctNow++;state.stats.correct++;w.correct++;scheduleAfterAnswer(w,true);$("resultBox").className="result good";$("resultBox").textContent=`정답입니다. ${reviewLabel(w)}`}
+ else{wrongNow++;state.stats.wrong++;w.wrong++;scheduleAfterAnswer(w,false);btn.classList.add("wrong");$("resultBox").className="result bad";$("resultBox").textContent=`오답입니다. 정답: ${w.ko} · 10분 뒤 다시 복습` }
+ recordDaily(ok);save();refreshAll();$("nextBtn").disabled=false
+}
+$("newQuizBtn").onclick=buildQuiz;
+$("nextBtn").onclick=()=>{if(!answered)return;current++;renderQuiz()};
+
+function startWrongQuiz(){
+ const category=$("myWordCategory").value;
+ const selected=category==="due"?dueReviewWords():category==="favorite"?state.words.filter(w=>w.favorite):category==="longterm"?state.words.filter(w=>w.reviewStatus==="longterm"):category==="mastered"?state.words.filter(w=>w.reviewStatus==="mastered"):category==="all"?state.words.filter(w=>w.favorite||w.reviewStatus!=="new"):state.wrongIds.map(byId).filter(Boolean);
+ if(selected.length===0){alert("현재 선택한 카테고리에 단어가 없습니다.");return}
+ if(new Set(state.words.map(w=>w.ko).filter(Boolean)).size<4){alert("4지선다 시험에는 서로 다른 한국어 뜻이 최소 4개 필요합니다.");return}
+ const n=Math.min(Number($("quizCount").value)||10,selected.length);
+ quiz=shuffle(selected).slice(0,n);current=0;correctNow=0;wrongNow=0;answered=false;setTab("quiz");renderQuiz();
+}
+$("wrongQuizBtn").onclick=startWrongQuiz;
+function renderWordRows(container,words,showLearned=false){
+ if(!words.length){container.innerHTML='<div class="note" style="padding:18px 0">표시할 단어가 없습니다.</div>';return}
+ container.innerHTML=words.map(w=>`<div class="word-row"><div><div class="en">${esc(w.en)} <button class="pronunciation" data-speak="${esc(w.id)}" title="발음 듣기">${w.ipa?esc(w.ipa):"발음 불러오는 중…"} 🔊</button></div><div class="meta">${w.day?"Day "+esc(w.day)+" · ":""}${esc(w.source)}${w.reviewStatus!=="new"?" · "+esc(reviewLabel(w)):""}</div></div><div class="meaning">${esc(w.ko)}</div><div class="toolbar"><button data-fav="${w.id}">${w.favorite?"★":"☆"}</button>${showLearned?`<button data-learned="${w.id}">장기 복습으로</button>`:""}<button data-del="${w.id}">삭제</button></div></div>`).join("")
+}
+document.addEventListener("click",e=>{
+ const speak=e.target.closest("[data-speak]"),fav=e.target.closest("[data-fav]"),del=e.target.closest("[data-del]"),learn=e.target.closest("[data-learned]");
+ if(speak){const w=byId(speak.dataset.speak);if(w)speakWord(w.en);return}
+ if(fav){const w=byId(fav.dataset.fav);if(w){w.favorite=!w.favorite;save();refreshAll()}}
+ if(del){if(confirm("이 단어를 삭제할까요?")){state.words=state.words.filter(w=>w.id!==del.dataset.del);state.wrongIds=state.wrongIds.filter(id=>id!==del.dataset.del);save();refreshAll()}}
+ if(learn){const w=byId(learn.dataset.learned);if(w){state.wrongIds=state.wrongIds.filter(id=>id!==w.id);w.reviewStatus="longterm";w.correctStreak=Math.max(3,w.correctStreak||0);w.reviewLevel=Math.max(1,w.reviewLevel||0);w.nextReview=addDaysISO(7);save();refreshAll();toast("삭제하지 않고 7일 뒤 장기 복습으로 이동했습니다.")}}
+});
+function renderWrong(){
+ const category=$("myWordCategory")?.value||"due";
+ const groups={due:dueReviewWords(),wrong:state.wrongIds.map(byId).filter(Boolean),longterm:state.words.filter(w=>w.reviewStatus==="longterm"),mastered:state.words.filter(w=>w.reviewStatus==="mastered"),favorite:state.words.filter(w=>w.favorite),all:state.words.filter(w=>w.favorite||w.reviewStatus!=="new")};
+ const list=groups[category]||[];renderWordRows($("wrongList"),list,category==="wrong");
+ const names={due:"오늘 복습",wrong:"오답 집중",longterm:"장기 복습",mastered:"학습 완료",favorite:"즐겨찾기",all:"전체 내 단어"};
+ const info=$("wrongQuizInfo");if(info)info.textContent=`${names[category]} ${list.length}개`;
+ const btn=$("wrongQuizBtn");if(btn){btn.textContent=`${names[category]} 시험`;btn.disabled=list.length===0}
+}
+$("myWordCategory").addEventListener("change",renderWrong);
+function filteredWords(){const q=$("searchInput").value.trim().toLowerCase(),d=$("wordDayFilter").value,s=$("wordSourceFilter").value;return state.words.filter(w=>(!q||w.en.toLowerCase().includes(q)||w.ko.includes(q))&&(!d||w.day===d)&&(!s||w.source===s))}
+function renderWords(){renderWordRows($("wordList"),filteredWords())}
+["searchInput","wordDayFilter","wordSourceFilter"].forEach(id=>$(id).addEventListener(id==="searchInput"?"input":"change",renderWords));
+function renderDays(){
+ const days=uniqueDays();$("dayCards").innerHTML=days.length?days.map(d=>`<button class="day-card" data-day="${esc(d)}"><b>Day ${esc(d)}</b><div class="note">${state.words.filter(w=>w.day===d).length}개 단어</div></button>`).join(""):'<div class="note">Day 정보가 있는 단어가 없습니다.</div>'
+}
+$("dayCards").onclick=e=>{const b=e.target.closest("[data-day]");if(!b)return;activeDay=b.dataset.day;$("dayDetail").classList.remove("hidden");$("dayTitle").textContent=`Day ${activeDay}`;renderWordRows($("dayWordList"),state.words.filter(w=>w.day===activeDay));$("dayDetail").scrollIntoView({behavior:"smooth"})};
+$("dayQuizBtn").onclick=()=>{$("quizScope").value="all";$("quizDay").value=activeDay;setTab("quiz");buildQuiz()};
+$("addTextBtn").onclick=()=>{const rows=parseText($("bulkText").value,$("sourceName").value.trim()||"직접 추가",$("defaultDay").value);const r=addWords(rows);$("addResult").textContent=`추가 ${r.added}개 · 기존 단어 병합 ${r.merged}개`;toast(`${r.added}개 추가했습니다.`)};
+$("clearTextBtn").onclick=()=>{$("bulkText").value="";$("addResult").textContent=""};
+$("textFile").onchange=async e=>{
+ const f=e.target.files[0];
+ if(!f)return;
+ try{
+  const text=await f.text();
+  $("bulkText").value=text;
+  const source=$("sourceName").value.trim()||f.name.replace(/\.[^.]+$/,"");
+  const rows=parseText(text,source,$("defaultDay").value);
+
+  if(!rows.length){
+   statusMsg("TXT에서 '영어 | 한국어 뜻' 형식의 단어를 찾지 못했습니다.",true);
+   return;
+  }
+
+  const dayCounts={};
+  rows.forEach(r=>{
+   const key=r.day?`Day ${r.day}`:"Day 미지정";
+   dayCounts[key]=(dayCounts[key]||0)+1;
+  });
+
+  const result=addWords(rows);
+  const detail=Object.entries(dayCounts)
+    .sort((a,b)=>{
+      const na=Number((a[0].match(/\d+/)||[9999])[0]);
+      const nb=Number((b[0].match(/\d+/)||[9999])[0]);
+      return na-nb;
+    })
+    .map(([k,v])=>`${k}(${v}개)`)
+    .join(" · ");
+
+  statusMsg(`TXT 추가 완료: 신규 ${result.added}개 · 병합 ${result.merged}개<br>${detail}`);
+  toast(`${result.added}개 추가했습니다.`);
+ }catch(err){
+  statusMsg("TXT 오류: "+err.message,true);
+ }
+};
+function loadScript(src,globalName){return new Promise((resolve,reject)=>{if(globalName&&window[globalName])return resolve();const s=document.createElement("script");s.src=src;s.onload=resolve;s.onerror=()=>reject(new Error("외부 라이브러리를 불러오지 못했습니다."));document.head.appendChild(s)})}
+$("excelFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;statusMsg("Excel을 읽는 중...");try{await loadScript("https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js","XLSX");const buf=await f.arrayBuffer(),book=XLSX.read(buf),rows=[];for(const name of book.SheetNames){const a=XLSX.utils.sheet_to_json(book.Sheets[name],{header:1,defval:""});for(let i=1;i<a.length;i++){const r=a[i],day=r[0],en=r[1],ko=r[2];if(en&&ko)rows.push({day:String(day).replace(/^day/i,""),en,ko,source:$("sourceName").value.trim()||f.name})}}const x=addWords(rows);statusMsg(`Excel 완료: ${x.added}개 추가`)}catch(err){statusMsg("Excel 오류: "+err.message,true)}};
+$("pdfFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;statusMsg("PDF 텍스트를 추출하는 중...");try{await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js","pdfjsLib");pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";const pdf=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise;let text="";for(let p=1;p<=pdf.numPages;p++){const page=await pdf.getPage(p),content=await page.getTextContent();text+=content.items.map(x=>x.str).join(" ")+"\n"}$("bulkText").value=text;statusMsg(`PDF ${pdf.numPages}페이지 추출 완료. 입력칸을 확인한 뒤 단어 추가를 누르세요.`)}catch(err){statusMsg("PDF 오류: "+err.message,true)}};
+$("imageFile").onchange=async e=>{const files=[...e.target.files];if(!files.length)return;statusMsg("OCR 준비 중...");try{await loadScript("https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js","Tesseract");let text="";for(let i=0;i<files.length;i++){statusMsg(`OCR ${i+1}/${files.length} 처리 중...`);const r=await Tesseract.recognize(files[i],"eng+kor");text+=r.data.text+"\n"}$("bulkText").value=text;statusMsg("OCR 완료. 잘못 인식된 부분을 확인한 뒤 단어 추가를 누르세요.")}catch(err){statusMsg("OCR 오류: "+err.message,true)}};
+function statusMsg(msg,bad=false){$("importStatus").innerHTML=`<div class="${bad?"error-box":"note"}" style="margin-top:10px">${esc(msg)}</div>`}
+function streaks(){const days=Object.keys(state.stats.daily).filter(k=>{const x=state.stats.daily[k];return(x.correct||0)+(x.wrong||0)>0}).sort();let best=0,run=0,prev=null;for(const k of days){const d=new Date(k+"T00:00:00");if(prev&&(d-prev)/86400000===1)run++;else run=1;best=Math.max(best,run);prev=d}let cur=0,d=new Date();if(!days.includes(todayKey()))d.setDate(d.getDate()-1);while(days.includes(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`)){cur++;d.setDate(d.getDate()-1)}return{cur,best}}
+function dueReviewWords(){const now=new Date();return state.words.filter(w=>w.nextReview&&new Date(w.nextReview)<=now).sort((a,b)=>new Date(a.nextReview)-new Date(b.nextReview))}
+function reminderDue(){if(state.settings.reviewInterval===0||!dueReviewWords().length)return false;const now=new Date(),[h,m]=state.settings.reviewTime.split(":").map(Number);if(now.getHours()<h||(now.getHours()===h&&now.getMinutes()<m))return false;return state.settings.lastReminder!==todayKey()}
+async function checkReviewReminder(){if(!reminderDue())return;const count=dueReviewWords().length,msg=`복습할 단어 ${count}개가 있습니다.`;if("Notification" in window&&Notification.permission==="granted")new Notification("단어장 복습 시간",{body:msg,icon:""});else toast(msg);state.settings.lastReminder=todayKey();save()}
+function scheduleReminderCheck(){checkReviewReminder();setInterval(checkReviewReminder,60000)}
+function renderStats(){
+ $("statWords").textContent=state.words.length;$("statWrong").textContent=state.wrongIds.length;const total=state.stats.correct+state.stats.wrong;$("statAccuracy").textContent=total?Math.round(state.stats.correct/total*100)+"%":"0%";const st=streaks();$("currentStreak").textContent=st.cur+"일";$("bestStreak").textContent=st.best+"일";
+ const now=new Date(),y=now.getFullYear(),m=now.getMonth(),first=new Date(y,m,1),last=new Date(y,m+1,0);$("calendarTitle").textContent=`${y}년 ${m+1}월`;$("calendar").innerHTML=["일","월","화","수","목","금","토"].map(x=>`<div class="note" style="text-align:center">${x}</div>`).join("")+"<div></div>".repeat(first.getDay())+Array.from({length:last.getDate()},(_,i)=>{const d=i+1,k=`${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`,x=state.stats.daily[k],n=x?(x.correct||0)+(x.wrong||0):0;return`<div class="cal ${n?"active":""} ${k===todayKey()?"today":""}"><b>${d}</b>${n?`<br>${n}문제`:""}</div>`}).join("")
+}
+
+function firebaseConfigured(){
+ const c=window.FIREBASE_CONFIG||{};
+ return !!(c.apiKey&&c.projectId&&window.FIREBASE_VAPID_KEY&&!String(c.apiKey).startsWith("PASTE_"));
+}
+function getPushUserId(){
+ if(!state.settings.pushUserId)state.settings.pushUserId=(crypto.randomUUID?crypto.randomUUID():uid()).replace(/-/g,"")+uid();
+ return state.settings.pushUserId.slice(0,80);
+}
+function nextPushMoment(){
+ const due=dueReviewWords();
+ if(!due.length)return null;
+ const [h,m]=(state.settings.reviewTime||"20:00").split(":").map(Number);
+ const now=new Date();
+ let target=new Date();target.setHours(h,m,0,0);
+ if(target<=now)target=new Date(now.getTime()+60000);
+ return target;
+}
+async function syncPushSchedule(){
+ if(!state.settings.pushEnabled||!firebaseConfigured()||!window.firebase)return;
+ try{
+  const due=dueReviewWords(),target=nextPushMoment();
+  if(!target)return;
+  const db=firebase.firestore();
+  await db.collection("vocabPushUsers").doc(getPushUserId()).set({
+   enabled:true,reviewTime:state.settings.reviewTime||"20:00",dueCount:due.length,
+   nextNotificationAt:firebase.firestore.Timestamp.fromDate(target),
+   updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
+   appUrl:location.origin+location.pathname.replace(/[^/]*$/,"") ,platform:"ipad-pwa"
+  },{merge:true});
+  save();
+ }catch(err){console.warn("푸시 일정 동기화 실패",err)}
+}
+async function connectBackgroundPush(){
+ if(!firebaseConfigured()){
+  $("pushStatus").textContent="firebase-config.js에 Firebase 설정값을 넣은 뒤 다시 연결하세요.";
+  toast("Firebase 설정값이 필요합니다.");return;
+ }
+ if(!("serviceWorker" in navigator)||!("Notification" in window)){
+  toast("이 브라우저는 백그라운드 알림을 지원하지 않습니다.");return;
+ }
+ try{
+  $("pushStatus").textContent="알림 연결 중...";
+  const permission=await Notification.requestPermission();
+  if(permission!=="granted")throw new Error("알림 권한이 허용되지 않았습니다.");
+  if(!firebase.apps.length)firebase.initializeApp(window.FIREBASE_CONFIG);
+  const reg=await navigator.serviceWorker.ready;
+  const token=await firebase.messaging().getToken({vapidKey:window.FIREBASE_VAPID_KEY,serviceWorkerRegistration:reg});
+  if(!token)throw new Error("푸시 토큰을 만들지 못했습니다.");
+  const db=firebase.firestore(),target=nextPushMoment()||new Date(Date.now()+60000);
+  await db.collection("vocabPushUsers").doc(getPushUserId()).set({
+   token,enabled:true,reviewTime:state.settings.reviewTime||"20:00",dueCount:dueReviewWords().length,
+   nextNotificationAt:firebase.firestore.Timestamp.fromDate(target),updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
+   appUrl:location.origin+location.pathname.replace(/[^/]*$/,"") ,platform:"ipad-pwa"
+  },{merge:true});
+  state.settings.pushEnabled=true;save();
+  $("pushStatus").textContent="백그라운드 알림이 연결되었습니다.";
+  toast("백그라운드 알림을 연결했습니다.");
+ }catch(err){
+  state.settings.pushEnabled=false;save();
+  $("pushStatus").textContent="연결 실패: "+err.message;
+  toast("알림 연결에 실패했습니다.");
+ }
+}
+$("pushConnectBtn").onclick=connectBackgroundPush;
+
+$("exportBtn").onclick=()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`단어장_백업_${todayKey()}.json`;a.click();URL.revokeObjectURL(a.href)};
+$("backupFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{state=normalizeState(JSON.parse(await f.text()));save();refreshAll();toast("백업을 복원했습니다.")}catch(err){alert("올바른 백업 파일이 아닙니다.")}};
+$("saveReminderBtn").onclick=async()=>{const interval=Number($("reviewInterval").value),time=$("reviewTime").value||"20:00";state.settings.reviewInterval=interval===0?0:1;state.settings.reviewTime=time;state.settings.lastReminder="";save();$("reminderInfo").textContent=interval?`단어별 자동 복습 일정에 따라 ${time}에 오늘 복습할 단어를 알려줍니다.`:"복습 알림이 꺼졌습니다.";if(!interval&&state.settings.pushEnabled&&firebaseConfigured()&&window.firebase){try{if(!firebase.apps.length)firebase.initializeApp(window.FIREBASE_CONFIG);await firebase.firestore().collection("vocabPushUsers").doc(getPushUserId()).set({enabled:false,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})}catch(e){console.warn(e)}}else await syncPushSchedule();toast("복습 알림 설정을 저장했습니다.")};
+$("resetBtn").onclick=()=>{if(confirm("모든 단어와 학습 기록을 삭제할까요?")){state=emptyState();save();quiz=[];renderQuiz();refreshAll();toast("초기화했습니다.")}};
+let deferredPrompt=null;window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;$("installBtn").classList.remove("hidden")});$("installBtn").onclick=async()=>{if(deferredPrompt){deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;$("installBtn").classList.add("hidden")}};
+window.addEventListener("error",e=>console.error("앱 오류:",e.error||e.message));
+refreshAll();renderQuiz();$("reviewInterval").value=String(state.settings.reviewInterval||0);$("reviewTime").value=state.settings.reviewTime||"20:00";$("pushStatus").textContent=state.settings.pushEnabled?"백그라운드 알림이 연결되어 있습니다.":(firebaseConfigured()?"홈 화면에 설치한 뒤 백그라운드 알림을 연결하세요.":"firebase-config.js 설정 후 백그라운드 알림을 연결할 수 있습니다.");if(firebaseConfigured()&&window.firebase&&!firebase.apps.length)firebase.initializeApp(window.FIREBASE_CONFIG);enrichMissingPronunciations();scheduleReminderCheck();setTimeout(syncPushSchedule,1500);
+
+// 자동 진단: 주소 끝에 ?selftest=1을 붙였을 때만 실행됩니다.
+async function runSelfTest(){
+ const results=[];
+ const check=(name,ok,detail="")=>results.push({name,ok:!!ok,detail});
+ try{
+  // 별도 백업 후 테스트
+  const backup=JSON.stringify(state);
+  const sample=`Day 1\nresume | 이력서\napplicant | 지원자\nDay 2\nbudget | 예산\nrevenue | 수익\nexpense | 비용`;
+  const rows=parseText(sample,"자가진단","");
+  check("TXT Day 자동 인식",rows.length===6&&rows[0].day==="1"&&rows[2].day==="2",JSON.stringify(rows));
+  state=emptyState();
+  const ar=addWords(rows);
+  check("단어 추가",ar.added===6&&state.words.length===6,`added=${ar.added}`);
+  check("Day 카드 분류",uniqueDays().join(",")==="1,2",uniqueDays().join(","));
+
+  $("quizScope").value="all"; $("quizDay").value=""; $("quizSource").value=""; $("quizCount").value="10";
+  buildQuiz();
+  check("시험 생성",quiz.length===6&&document.querySelectorAll(".choice").length===4,`quiz=${quiz.length}, choices=${document.querySelectorAll(".choice").length}`);
+
+  const q=quiz[0];
+  const wrongBtn=[...document.querySelectorAll(".choice")].find(b=>b.textContent!==q.ko);
+  wrongBtn.click();
+  check("오답 저장",state.wrongIds.includes(q.id)&&$("wrongBadge").textContent==="1",JSON.stringify(state.wrongIds));
+  check("오답 목록 표시",$("wrongList").textContent.includes(q.en),$("wrongList").textContent);
+
+  // 같은 단어를 다시 맞히면 오답 제거되는지 직접 새 문제로 검증
+  quiz=[q]; current=0; answered=false; renderQuiz();
+  const correctBtn=[...document.querySelectorAll(".choice")].find(b=>b.textContent===q.ko);
+  correctBtn.click();
+  check("재정답 시 오답 제거",!state.wrongIds.includes(q.id)&&$("wrongBadge").textContent==="0",JSON.stringify(state.wrongIds));
+
+  // 저장/복원
+  save(); const reloaded=normalizeState(JSON.parse(localStorage.getItem(STORAGE_KEY)));
+  check("로컬 저장",reloaded.words.length===6&&Array.isArray(reloaded.wrongIds),`words=${reloaded.words.length}`);
+
+  // 백업 복구
+  state=normalizeState(JSON.parse(backup)); save(); refreshAll(); quiz=[]; renderQuiz();
+ }catch(err){results.push({name:"예외 없음",ok:false,detail:String(err&&err.stack||err)})}
+ const all=results.every(r=>r.ok);
+ document.body.innerHTML=`<main style="max-width:900px;margin:30px auto;font-family:-apple-system,sans-serif"><h1>단어장 자동 진단: ${all?"통과":"실패"}</h1>${results.map(r=>`<div data-test="${r.ok?"pass":"fail"}" style="padding:10px;margin:6px 0;border:1px solid ${r.ok?"#16a34a":"#dc2626"}">${r.ok?"✅":"❌"} ${esc(r.name)} <small>${esc(r.detail)}</small></div>`).join("")}</main>`;
+ document.documentElement.dataset.selftest=all?"pass":"fail";
+}
+if(new URLSearchParams(location.search).get("selftest")==="1")setTimeout(runSelfTest,0);
+
+if("serviceWorker" in navigator&&location.protocol.startsWith("http"))navigator.serviceWorker.register("./service-worker.js").catch(console.error);
+</script>
+</body></html>
