@@ -9,3 +9,4 @@ globalThis.FIREBASE_CONFIG = {
   appId: "PASTE_APP_ID"
 };
 globalThis.FIREBASE_VAPID_KEY = "PASTE_PUBLIC_VAPID_KEY";
+
